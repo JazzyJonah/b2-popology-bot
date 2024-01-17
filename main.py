@@ -1,4 +1,4 @@
-from discord import Client, Intents, Interaction, Activity, ActivityType, app_commands
+from discord import Client, Intents, AllowedMentions, Interaction, Activity, ActivityType, app_commands
 from discord.app_commands import CommandTree
 from threading import Thread
 from requests import get
@@ -7,9 +7,10 @@ from time import time
 from getToken import getToken
 from makePlayerEmbeds import findPlayer, createPlayerEmbed
 from makeLeaderboardEmbed import createLeaderboardEmbed, LeaderboardView
+from secretInteractions import checkForSecrets
 
 
-client = Client(intents = Intents.all())
+client = Client(intents = Intents.all(), allowed_mentions=AllowedMentions.none())
 tree = CommandTree(client)
 
 @client.event
@@ -17,6 +18,12 @@ async def on_ready():
     # await tree.sync()
     await client.change_presence(activity=Activity(type=ActivityType.playing, name='Bloons TD Battles 2'))
     print(f'Logged in as {client.user} (ID: {client.user.id})')
+
+@client.event
+async def on_message(message):
+    if not message.author.bot:
+        await checkForSecrets(message, client)
+
 
 @tree.command(
     name = 'info',
@@ -48,6 +55,12 @@ async def ping(interaction: Interaction, ephemeral: bool = False):
             data = [f"{x} {interaction.user.id}"]
             with open("pings.txt", "w") as g:
                 g.writelines(data)
+            if not ephemeral:
+                message = await interaction.original_response()
+                await message.pin(reason="new wr")
+            else:
+                message = await interaction.channel.send(f"New wr! <@{interaction.user.id}> got a time of {str(x*1000)[:6]}||{str(x*1000)[6:]}||ms")
+                await message.pin(reason="new wr")
     await interaction.edit_original_response(content=f"Pong! Response took {str(x*1000)[:6]}||{str(x*1000)[6:]}||ms\n\nThe current wr is <@{data[0].split(' ')[1]}> with a whopping time of {str(float(data[0].split(' ')[0])*1000)[:6]}||{str(float(data[0].split(' ')[0])*1000)[6:]}||ms")
     
 @tree.command(
