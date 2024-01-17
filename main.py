@@ -70,25 +70,24 @@ async def ping(interaction: Interaction, ephemeral: bool = False):
 @app_commands.describe(season = 'Season', page = 'Page', ephemeral = 'Ephemeral?')
 async def leaderboard(interaction: Interaction, season: int = 16, page: int = 1, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
-    if season < 9:
-        await interaction.response.send_message("Season must be 9 or higher", ephemeral=ephemeral)
-        return
-    result = [None,]
-    backgroundEmbed = Thread(target=createLeaderboardEmbed, args=(page, season, interaction, result))
-    backgroundEmbed.start()
-    while backgroundEmbed.is_alive():
-        pass
-    em = result[0]
+    try:
+        if season < 9:
+            await interaction.followup.send("Season must be 9 or higher", ephemeral=ephemeral)
+            return
+        result = [None,]
+        backgroundEmbed = Thread(target=createLeaderboardEmbed, args=(page, season, result))
+        backgroundEmbed.start()
+        while backgroundEmbed.is_alive():
+            pass
+        em = result[0]
 
-    totalPlayers = get("https://data.ninjakiwi.com/battles2/homs/").json()["body"]
-    seasonIndex = next((i for i in range(len(totalPlayers)) if totalPlayers[i]["name"][-2:] == str(season)), None)
-    totalPlayers = totalPlayers[seasonIndex]["totalScores"]
-    view = LeaderboardView(page=page, totalPlayers=totalPlayers, interaction=interaction, season=season)
-    # try:
-    await interaction.followup.send(embed=em, view=view)
-    # except Exception as e:
-    #     await interaction.followup.send("Something went wrong")
-    #     print(e)
+        totalPlayers = get("https://data.ninjakiwi.com/battles2/homs/").json()["body"]
+        seasonIndex = next((i for i in range(len(totalPlayers)) if totalPlayers[i]["name"][-2:] == str(season)), None)
+        totalPlayers = totalPlayers[seasonIndex]["totalScores"]
+        view = LeaderboardView(page=page, totalPlayers=totalPlayers, interaction=interaction, season=season)
+        await interaction.followup.send(embed=em, view=view)
+    except:
+        await interaction.followup.send("Something went wrong")
 
     
 userGroup = app_commands.Group(name = 'user', description='Get info about a user')
@@ -99,19 +98,19 @@ userGroup = app_commands.Group(name = 'user', description='Get info about a user
 @app_commands.describe(leaderboard_position = 'Leaderboard position', season = 'Season', ephemeral = 'Ephemeral?')
 async def user_leaderboard_position(interaction: Interaction, leaderboard_position: int, season: int = 16, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
-    leaderboard_position -= 1
-    if season < 9:
-        await interaction.response.send_message("Season must be 9 or higher", ephemeral=ephemeral)
-        return
-    profile, ranks = findPlayer(season, position=leaderboard_position)
-
-    result = [None,]
-    backgroundEmbed = Thread(target=createPlayerEmbed, args=(profile, ranks, interaction, result))
-    backgroundEmbed.start()
-    while backgroundEmbed.is_alive():
-        pass
-    em = result[0]
     try:
+        leaderboard_position -= 1
+        if season < 9:
+            await interaction.followup.send("Season must be 9 or higher", ephemeral=ephemeral)
+            return
+        profile, ranks = findPlayer(season, position=leaderboard_position)
+
+        result = [None,]
+        backgroundEmbed = Thread(target=createPlayerEmbed, args=(profile, ranks, interaction, result))
+        backgroundEmbed.start()
+        while backgroundEmbed.is_alive():
+            pass
+        em = result[0]
         await interaction.followup.send(embed=em)
     except:
         await interaction.followup.send("Something went wrong")
@@ -123,18 +122,18 @@ async def user_leaderboard_position(interaction: Interaction, leaderboard_positi
 @app_commands.describe(username = 'Username', season = 'Season', ephemeral = 'Ephemeral?')
 async def user_username(interaction: Interaction, username: str, season: int = 16, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
-    if season < 9:
-        await interaction.response.send_message("Season must be 9 or higher", ephemeral=ephemeral)
-        return
-    profile, ranks = findPlayer(season, username=username)
-
-    result = [None,]
-    backgroundEmbed = Thread(target=createPlayerEmbed, args=(profile, ranks, interaction, result))
-    backgroundEmbed.start()
-    while backgroundEmbed.is_alive():
-        pass
-    em = result[0]
     try:
+        if season < 9:
+            await interaction.response.send_message("Season must be 9 or higher", ephemeral=ephemeral)
+            return
+        profile, ranks = findPlayer(season, username=username)
+
+        result = [None,]
+        backgroundEmbed = Thread(target=createPlayerEmbed, args=(profile, ranks, interaction, result))
+        backgroundEmbed.start()
+        while backgroundEmbed.is_alive():
+            pass
+        em = result[0]
         await interaction.followup.send(embed=em)
     except:
         await interaction.followup.send("Something went wrong")
@@ -146,18 +145,18 @@ async def user_username(interaction: Interaction, username: str, season: int = 1
 @app_commands.describe(oakid = 'OakID', season = 'Season', ephemeral = 'Ephemeral?')
 async def user_oakid(interaction: Interaction, oakid: int, season: int = 16, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
-    if season < 9:
-        await interaction.response.send_message("Season must be 9 or higher", ephemeral=ephemeral)
-        return
-    profile, ranks = findPlayer(season, oakID=oakid)
-
-    result = [None,]
-    backgroundEmbed = Thread(target=createPlayerEmbed, args=(profile, ranks, interaction, result))
-    backgroundEmbed.start()
-    while backgroundEmbed.is_alive():
-        pass
-    em = result[0]
     try:
+        if season < 9:
+            await interaction.response.send_message("Season must be 9 or higher", ephemeral=ephemeral)
+            return
+        profile, ranks = findPlayer(season, oakID=oakid)
+
+        result = [None,]
+        backgroundEmbed = Thread(target=createPlayerEmbed, args=(profile, ranks, interaction, result))
+        backgroundEmbed.start()
+        while backgroundEmbed.is_alive():
+            pass
+        em = result[0]
         await interaction.followup.send(embed=em)
     except:
         await interaction.followup.send("Something went wrong")

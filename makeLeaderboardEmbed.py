@@ -5,7 +5,7 @@ from discord import ButtonStyle
 from math import ceil
 from threading import Thread
 
-def createLeaderboardEmbed(page, season, interaction, result):
+def createLeaderboardEmbed(page, season, result):
     apiPage = (page-1)//5+1
     endpoint = f"https://data.ninjakiwi.com/battles2/homs/season_{season-1}/leaderboard?page={apiPage}"
     allPlayers = get(endpoint).json()['body']
@@ -45,7 +45,7 @@ def createLeaderboardEmbed(page, season, interaction, result):
 
 class LeaderboardView(View):
     def __init__(self, page, totalPlayers, interaction, season):
-        super().__init__()
+        super().__init__(timeout=None)
         self.page = page
         self.totalPlayers = totalPlayers
         self.interaction = interaction
@@ -80,15 +80,15 @@ class LeaderboardButton(Button):
         self.interaction = interaction
         self.season = season
     async def callback(self, interaction: Interaction):
-        self.page += self.value
-        result = [None,]
-        backgroundEmbed = Thread(target=createLeaderboardEmbed, args=(self.page, self.season, self.interaction, result))
-        backgroundEmbed.start()
-        while backgroundEmbed.is_alive():
-            pass
-        em = result[0]
-        view = LeaderboardView(page=self.page, totalPlayers=self.totalPlayers, interaction=self.interaction, season=self.season)
         try:
+            self.page += self.value
+            result = [None,]
+            backgroundEmbed = Thread(target=createLeaderboardEmbed, args=(self.page, self.season, result))
+            backgroundEmbed.start()
+            while backgroundEmbed.is_alive():
+                pass
+            em = result[0]
+            view = LeaderboardView(page=self.page, totalPlayers=self.totalPlayers, interaction=self.interaction, season=self.season)
             await interaction.response.edit_message(embed=em, view=view)
         except:
             await interaction.followup.send("Something went wrong")
