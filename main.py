@@ -8,6 +8,7 @@ from getToken import getToken
 from makePlayerEmbeds import findPlayer, createPlayerEmbed
 from makeLeaderboardEmbed import createLeaderboardEmbed, LeaderboardView
 from secretInteractions import checkForSecrets
+from starboard import checkStarboard
 
 
 client = Client(intents = Intents.all(), allowed_mentions=AllowedMentions.none())
@@ -24,6 +25,9 @@ async def on_message(message):
     if not message.author.bot:
         await checkForSecrets(message, client)
 
+@client.event
+async def on_raw_reaction_add(payload):
+    await checkStarboard(client, payload)
 
 @tree.command(
     name = 'info',
