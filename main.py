@@ -41,6 +41,8 @@ async def info(interaction: Interaction, ephemeral: bool = False):
             `/ping` - Pong!
             `/leaderboard` - shows the current Battles 2 leaderboard
             `/user` - Shows information about a user, either by leaderboard position, username, or OakID
+
+            ||Developed by JazzyJonah - [Source Code](https://github.com/JazzyJonah/b2-popology-bot)
         """, 
         ephemeral=ephemeral)
     
