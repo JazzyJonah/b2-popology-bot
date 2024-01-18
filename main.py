@@ -1,8 +1,7 @@
-from discord import Client, Intents, AllowedMentions, Interaction, Activity, ActivityType, app_commands
+from discord import Client, Intents, AllowedMentions, Interaction, Activity, ActivityType, app_commands, Member
 from discord.app_commands import CommandTree
-from threading import Thread
-from requests import get
 from time import time
+from datetime import timedelta
 
 from getToken import getToken
 from makePlayerEmbeds import findPlayer, createPlayerEmbed
@@ -24,6 +23,8 @@ async def on_ready():
 async def on_message(message):
     if not message.author.bot:
         await checkForSecrets(message, client)
+        if 'gfv' in message.content.lower():
+            await message.channel.send("https://cdn.discordapp.com/emojis/823054363885830144.gif")
 
 @client.event
 async def on_raw_reaction_add(payload):
@@ -39,7 +40,8 @@ async def info(interaction: Interaction, ephemeral: bool = False):
         """**List of Commands** \n
             `/info` - What you're seeing right now!
             `/ping` - Pong!
-            `/leaderboard` - shows the current Battles 2 leaderboard
+            `/timeout` - Timeout anyone you want!
+            `/leaderboard` - Shows the current Battles 2 leaderboard
             `/user` - Shows information about a user, either by leaderboard position, username, or OakID
 
             ||Developed by JazzyJonah - [Source Code](https://github.com/JazzyJonah/b2-popology-bot)
@@ -69,6 +71,24 @@ async def ping(interaction: Interaction, ephemeral: bool = False):
                 await message.pin(reason="new wr")
     await interaction.edit_original_response(content=f"Pong! Response took {str(x*1000)[:6]}||{str(x*1000)[6:]}||ms\n\nThe current wr is <@{data[0].split(' ')[1]}> with a whopping time of {str(float(data[0].split(' ')[0])*1000)[:6]}||{str(float(data[0].split(' ')[0])*1000)[6:]}||ms")
     
+@tree.command(
+    name = 'timeout',
+    description = 'Timeout anyone you want!'
+)
+@app_commands.describe(member = 'member to timeout', minutes = 'Minutes to timeout for', ephemeral = 'Ephemeral?')
+async def timeout(interaction, member: Member, minutes: int, ephemeral: bool = False):
+    try:
+        if minutes > 40320:
+            await interaction.response.send_message("Time must be less than 40320 minutes (28 days)", ephemeral=ephemeral)
+            return
+        if minutes < 1:
+            await interaction.response.send_message("Time must be greater than 0 minutes", ephemeral=ephemeral)
+            return
+        await interaction.user.timeout(timedelta(minutes=minutes))
+        await interaction.response.send_message(f"Timed out {interaction.user.mention} for {minutes} minutes", ephemeral=ephemeral)
+    except Exception as e:
+        await interaction.response.send_message("Something went wrong. Error: "+str(e), ephemeral=ephemeral)
+
 @tree.command(
     name = 'leaderboard',
     description = 'Get the current leaderboard'
