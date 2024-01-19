@@ -1,5 +1,6 @@
 from discord import Client, Intents, AllowedMentions, Interaction, Activity, ActivityType, app_commands, Member
 from discord.app_commands import CommandTree
+from discord.ext import tasks
 from time import time
 from datetime import timedelta
 
@@ -8,6 +9,7 @@ from makePlayerEmbeds import findPlayer, createPlayerEmbed
 from makeLeaderboardEmbed import createLeaderboardEmbed, LeaderboardView
 from secretInteractions import checkForSecrets
 from starboard import checkStarboard
+from checkSteam import checkSteam
 
 
 client = Client(intents = Intents.all(), allowed_mentions=AllowedMentions.none())
@@ -18,6 +20,11 @@ async def on_ready():
     # await tree.sync()
     await client.change_presence(activity=Activity(type=ActivityType.playing, name='Bloons TD Battles 2'))
     print(f'Logged in as {client.user} (ID: {client.user.id})')
+    try:
+        checkForUpdates.start()
+    except:
+        pass
+
 
 @client.event
 async def on_message(message):
@@ -34,6 +41,11 @@ async def on_message(message):
 async def on_raw_reaction_add(payload):
     await checkStarboard(client, payload)
 
+@tasks.loop(seconds=60)
+async def checkForUpdates():
+    await checkSteam(client)
+
+    
 @tree.command(
     name = 'info',
     description = 'Get info about the bot'
