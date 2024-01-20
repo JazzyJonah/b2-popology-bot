@@ -3,6 +3,8 @@ from discord.app_commands import CommandTree
 from discord.ext import tasks
 from time import time
 from datetime import timedelta
+from threading import Thread
+from requests import get
 
 from getToken import getToken
 from makePlayerEmbeds import findPlayer, createPlayerEmbed
