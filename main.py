@@ -9,7 +9,7 @@ from makePlayerEmbeds import findPlayer, createPlayerEmbed
 from makeLeaderboardEmbed import createLeaderboardEmbed, LeaderboardView
 from secretInteractions import checkForSecrets
 from starboard import checkStarboard
-from checkSteam import checkSteam
+from checkSteam import checkSteamNews, checkSteamUpdates
 
 
 client = Client(intents = Intents.all(), allowed_mentions=AllowedMentions.none())
@@ -43,7 +43,8 @@ async def on_raw_reaction_add(payload):
 
 @tasks.loop(seconds=60)
 async def checkForUpdates():
-    await checkSteam(client)
+    await checkSteamUpdates(client)
+    await checkSteamNews(client)
 
     
 @tree.command(

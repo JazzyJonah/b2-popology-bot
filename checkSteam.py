@@ -2,7 +2,17 @@ from requests import get
 from discord import Embed
 from datetime import datetime
 
-async def checkSteam(client):
+async def checkSteamUpdates(client):
+    r = get("https://api.steamcmd.net/v1/info/1276390").json()
+    latestTimeUpdated = r['data']['1276390']['depots']['branches']['public']['timeupdated']
+    with open('btdb2SteamReleaseTimestamp.txt', 'r+') as f:
+        data = f.readlines()
+        if str(latestTimeUpdated)+'\n' not in data:
+            data = [str(latestTimeUpdated)+'\n']
+            f.writelines(data)
+            await client.get_channel(1099139880937857064).send(f'**BTD Battles 2** has been updated!')
+
+async def checkSteamNews(client):
     r = get("https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=1276390").json()
     latestId = r['appnews']['newsitems'][0]['gid']
     with open("btdb2SteamGid.txt", "r+") as f:
