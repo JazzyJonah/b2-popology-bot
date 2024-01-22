@@ -1,5 +1,6 @@
 getToken.py
 secretInteractions.py
+pings.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
