@@ -1,7 +1,6 @@
 from requests import get
-from discord import Embed, Interaction
+from discord import Embed, Interaction, ButtonStyle
 from discord.ui import View, Button
-from discord import ButtonStyle
 from math import ceil
 from threading import Thread
 

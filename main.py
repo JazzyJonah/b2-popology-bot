@@ -12,6 +12,8 @@ from makeLeaderboardEmbed import createLeaderboardEmbed, LeaderboardView
 from secretInteractions import checkForSecrets
 from starboard import checkStarboard
 from checkSteam import checkSteamNews, checkSteamUpdates
+from makeMatchEmbeds import createSimpleMatchEmbed, MatchView
+import globals
 
 
 client = Client(intents = Intents.all(), allowed_mentions=AllowedMentions.none())
@@ -62,8 +64,9 @@ async def info(interaction: Interaction, ephemeral: bool = False):
             `/timeout` - Timeout anyone you want!
             `/leaderboard` - Shows the current Battles 2 leaderboard
             `/user` - Shows information about a user, either by leaderboard position, username, or OakID
+            `/matches` - Shows the recent matches of a user, either by leaderboard position, username, or OakID
 
-            ||Developed by JazzyJonah - [Source Code](https://github.com/JazzyJonah/b2-popology-bot)
+            ||Developed by JazzyJonah - [Source Code](<https://github.com/JazzyJonah/b2-popology-bot>)||
         """, 
         ephemeral=ephemeral)
     
@@ -113,7 +116,7 @@ async def timeout(interaction, member: Member, minutes: int, ephemeral: bool = F
     description = 'Get the current leaderboard'
 )
 @app_commands.describe(season = 'Season', page = 'Page', ephemeral = 'Ephemeral?')
-async def leaderboard(interaction: Interaction, season: int = 16, page: int = 1, ephemeral: bool = False):
+async def leaderboard(interaction: Interaction, season: int = globals.season, page: int = 1, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
     try:
         if season < 9:
@@ -141,7 +144,7 @@ userGroup = app_commands.Group(name = 'user', description='Get info about a user
     description = 'Get info about a user by leaderboard position'
 )
 @app_commands.describe(leaderboard_position = 'Leaderboard position', season = 'Season', ephemeral = 'Ephemeral?')
-async def user_leaderboard_position(interaction: Interaction, leaderboard_position: int, season: int = 16, ephemeral: bool = False):
+async def user_leaderboard_position(interaction: Interaction, leaderboard_position: int, season: int = globals.season, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
     try:
         leaderboard_position -= 1
@@ -165,7 +168,7 @@ async def user_leaderboard_position(interaction: Interaction, leaderboard_positi
     description = 'Get info about a user by username'
 )
 @app_commands.describe(username = 'Username', season = 'Season', ephemeral = 'Ephemeral?')
-async def user_username(interaction: Interaction, username: str, season: int = 16, ephemeral: bool = False):
+async def user_username(interaction: Interaction, username: str, season: int = globals.season, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
     try:
         if season < 9:
@@ -188,7 +191,7 @@ async def user_username(interaction: Interaction, username: str, season: int = 1
     description = 'Get info about a user by OakID'
 )
 @app_commands.describe(oakid = 'OakID', season = 'Season', ephemeral = 'Ephemeral?')
-async def user_oakid(interaction: Interaction, oakid: int, season: int = 16, ephemeral: bool = False):
+async def user_oakid(interaction: Interaction, oakid: int, season: int = globals.season, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
     try:
         if season < 9:
@@ -205,8 +208,50 @@ async def user_oakid(interaction: Interaction, oakid: int, season: int = 16, eph
         await interaction.followup.send(embed=em)
     except:
         await interaction.followup.send("Something went wrong")
+    
+matchesGroup = app_commands.Group(name='matches', description="Get the recent matches of a player")
+@matchesGroup.command(
+    name='leaderboard_position',
+    description='Get info on the recent matches of a player by leaderboard position'
+)
+@app_commands.describe(leaderboard_position = 'leaderboard_position', ephemeral = 'Ephemeral?')
+async def matches_leaderboard_position(interaction: Interaction, leaderboard_position: int, ephemeral: bool = False):
+    await interaction.response.defer(ephemeral=ephemeral)
+    profile, ranks = findPlayer(globals.season, position=leaderboard_position)
+    matches = get(profile["matches"]).json()["body"]
+    em = createSimpleMatchEmbed(matches, interaction)
+    matchView = MatchView(matches, interaction)
 
+    await interaction.followup.send(embed=em, view=matchView)
+@matchesGroup.command(
+    name='username',
+    description='Get info on the recent matches of a player by username'
+)
+@app_commands.describe(username = 'username', ephemeral = 'Ephemeral?')
+async def matches_username(interaction: Interaction, username: str, ephemeral: bool = False):
+    await interaction.response.defer(ephemeral=ephemeral)
+    profile, ranks = findPlayer(globals.season, username=username)
+    matches = get(profile["matches"]).json()["body"]
+    em = createSimpleMatchEmbed(matches, interaction)
+    matchView = MatchView(matches, interaction)
+
+    await interaction.followup.send(embed=em, view=matchView)
+@matchesGroup.command(
+    name='oakid',
+    description='Get info on the recent matches of a player by OakID'
+)
+@app_commands.describe(oakid = 'oakid', ephemeral = 'Ephemeral?')
+async def matches_oakid(interaction: Interaction, oakid: str, ephemeral: bool = False):
+    await interaction.response.defer(ephemeral=ephemeral)
+    profile, ranks = findPlayer(globals.season, oakID=oakid)
+    matches = get(profile["matches"]).json()["body"]
+    em = createSimpleMatchEmbed(matches, interaction)
+    matchView = MatchView(matches, interaction)
+
+    await interaction.followup.send(embed=em, view=matchView)
 
 
 tree.add_command(userGroup)
+tree.add_command(matchesGroup)
+
 client.run(getToken())
