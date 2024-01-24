@@ -1,6 +1,5 @@
 from discord import Embed, Interaction, ButtonStyle, SelectOption
 from discord.ui import View, Select, Button
-from requests import get
 from datetime import datetime
 
 def createSimpleMatchEmbed(matches, interaction):
@@ -16,11 +15,10 @@ def createSimpleMatchEmbed(matches, interaction):
             totalWins += 1
         elif match["player"+playerSide]["result"] == "lose":
             totalLosses += 1
-        otherNames += get(match["player"+otherSide]["profileURL"]).json()["body"]["displayName"]+"\n"
+        playerNames += match["player"+playerSide]["displayName"]+"\n"
+        otherNames += match["player"+otherSide]["displayName"]+"\n"
         results += match["player"+playerSide]["result"]+"\n"
-    player = get(matches[-1]["player"+playerSide]["profileURL"]).json()["body"]["displayName"]
-    for i in range(len(matches)):
-        playerNames += player+'\n'
+
     em = Embed(title="Matches", 
         url=matches[-1]["player"+playerSide]["profileURL"]+"/matches?pretty=true",
         color=int('%02x%02x%02x' % (totalLosses*10, totalWins*10, 0), 16),
@@ -39,7 +37,7 @@ def createSimpleMatchEmbed(matches, interaction):
 def createDetailedMatchEmbed(match, interaction):
     playerSide = "Left" if match["playerLeft"]["currentUser"] else "Right"
     otherSide = "Left" if not match["playerLeft"]["currentUser"] else "Right"
-    em = Embed(title=f'{get(match["player"+playerSide]["profileURL"]).json()["body"]["displayName"]} vs {get(match["player"+otherSide]["profileURL"]).json()["body"]["displayName"]}', 
+    em = Embed(title=f'{match["player"+playerSide]["displayName"]} vs {match["player"+otherSide]["displayName"]}', 
         url=match["player"+playerSide]["profileURL"]+"/matches?pretty=true",
         color=int('%02x%02x%02x' % (
             (0, 255, 0) if match["player"+playerSide]["result"] == "win"
@@ -83,7 +81,7 @@ class MatchSelect(Select):
             placeholder="Select a match", 
             options=[
                 SelectOption(
-                    label = f'{i+1}. {get(matches[i]["playerLeft"]["profileURL"]).json()["body"]["displayName"]} vs {get(matches[i]["playerRight"]["profileURL"]).json()["body"]["displayName"]}', 
+                    label = f'{i+1}. {matches[i]["playerLeft"]["displayName"]} vs {matches[i]["playerRight"]["displayName"]}', 
                     value = i
                 ) for i in range(len(matches))
             ]
