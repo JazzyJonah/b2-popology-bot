@@ -62,7 +62,7 @@ def createPlayerEmbed(profile, ranks, interaction, result):
     em = Embed(
         title = displayName,
         url = profile['matches']+'?pretty=true',
-        description = f'Showing stats for #{ranks['rank']}/{totalPlayers}: {displayName}',
+        description = f'Showing stats for #{ranks["rank"]}/{totalPlayers}: {displayName}',
         color = color
     )
     em.set_thumbnail(url=avatar)

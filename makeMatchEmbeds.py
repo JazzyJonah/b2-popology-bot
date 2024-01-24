@@ -39,7 +39,7 @@ def createSimpleMatchEmbed(matches, interaction):
 def createDetailedMatchEmbed(match, interaction):
     playerSide = "Left" if match["playerLeft"]["currentUser"] else "Right"
     otherSide = "Left" if not match["playerLeft"]["currentUser"] else "Right"
-    em = Embed(title=f"{get(match["player"+playerSide]["profileURL"]).json()["body"]["displayName"]} vs {get(match["player"+otherSide]["profileURL"]).json()["body"]["displayName"]}", 
+    em = Embed(title=f'{get(match["player"+playerSide]["profileURL"]).json()["body"]["displayName"]} vs {get(match["player"+otherSide]["profileURL"]).json()["body"]["displayName"]}', 
         url=match["player"+playerSide]["profileURL"]+"/matches?pretty=true",
         color=int('%02x%02x%02x' % (
             (0, 255, 0) if match["player"+playerSide]["result"] == "win"
@@ -53,14 +53,14 @@ def createDetailedMatchEmbed(match, interaction):
     em.add_field(name="Result", value=playerStuff["result"], inline=False)
     em.add_field(name="Left hero", value=playerStuff["hero"], inline=False)
     em.add_field(name="Right hero", value=otherStuff["hero"], inline=True)
-    em.add_field(name="Left towers", value=f"{playerStuff["towerone"]}, {playerStuff["towertwo"]}, {playerStuff["towerthree"]}", inline=False)
-    em.add_field(name="Right towers", value=f"{otherStuff["towerone"]}, {otherStuff["towertwo"]}, {otherStuff["towerthree"]}", inline=True)
+    em.add_field(name="Left towers", value=f'{playerStuff["towerone"]}, {playerStuff["towertwo"]}, {playerStuff["towerthree"]}', inline=False)
+    em.add_field(name="Right towers", value=f'{otherStuff["towerone"]}, {otherStuff["towertwo"]}, {otherStuff["towerthree"]}', inline=True)
     em.add_field(name="Game Type", value=match["gametype"], inline=False)
     em.add_field(name="Map", value=match["map"], inline=True)
     em.add_field(name="Rounds", value=match["endRound"], inline=True)
     em.add_field(name="Duration", value=match["duration"], inline=True)
     em.set_thumbnail(url=match["mapURL"])
-    em.set_footer(text=f"Data is pulled from the official Ninja Kiwi API, updated about every 5 minutes.",
+    em.set_footer(text="Data is pulled from the official Ninja Kiwi API, updated about every 5 minutes.",
         icon_url=interaction.guild.icon.url if interaction.guild.icon else interaction.user.avatar.url if interaction.user.avatar else None
     )
     
@@ -83,7 +83,7 @@ class MatchSelect(Select):
             placeholder="Select a match", 
             options=[
                 SelectOption(
-                    label = f"{i+1}. {get(matches[i]["playerLeft"]["profileURL"]).json()["body"]["displayName"]} vs {get(matches[i]["playerRight"]["profileURL"]).json()["body"]["displayName"]}", 
+                    label = f'{i+1}. {get(matches[i]["playerLeft"]["profileURL"]).json()["body"]["displayName"]} vs {get(matches[i]["playerRight"]["profileURL"]).json()["body"]["displayName"]}', 
                     value = i
                 ) for i in range(len(matches))
             ]

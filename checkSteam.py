@@ -10,7 +10,7 @@ async def checkSteamUpdates(client):
         if str(latestTimeUpdated)+'\n' not in data:
             data = [str(latestTimeUpdated)+'\n']
             f.writelines(data)
-            await client.get_channel(1099139880937857064).send(f'**BTD Battles 2** has been updated!')
+            await client.get_channel(1099139880937857064).send('**BTD Battles 2** has been updated!')
 
 async def checkSteamNews(client):
     r = get("https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=1276390").json()
