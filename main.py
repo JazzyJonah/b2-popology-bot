@@ -191,7 +191,7 @@ async def user_username(interaction: Interaction, username: str, season: int = g
     description = 'Get info about a user by OakID'
 )
 @app_commands.describe(oakid = 'OakID', season = 'Season', ephemeral = 'Ephemeral?')
-async def user_oakid(interaction: Interaction, oakid: int, season: int = globals.season, ephemeral: bool = False):
+async def user_oakid(interaction: Interaction, oakid: str, season: int = globals.season, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
     try:
         if season < 9:
@@ -217,12 +217,14 @@ matchesGroup = app_commands.Group(name='matches', description="Get the recent ma
 @app_commands.describe(leaderboard_position = 'leaderboard_position', ephemeral = 'Ephemeral?')
 async def matches_leaderboard_position(interaction: Interaction, leaderboard_position: int, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
-    profile, ranks = findPlayer(globals.season, position=leaderboard_position)
-    matches = get(profile["matches"]).json()["body"]
-    em = createSimpleMatchEmbed(matches, interaction)
-    matchView = MatchView(matches, interaction)
-
-    await interaction.followup.send(embed=em, view=matchView)
+    try:
+        profile, ranks = findPlayer(globals.season, position=leaderboard_position)
+        matches = get(profile["matches"]).json()["body"]
+        em = createSimpleMatchEmbed(matches, interaction)
+        matchView = MatchView(matches, interaction)
+        await interaction.followup.send(embed=em, view=matchView)
+    except:
+        await interaction.followup.send("Something went wrong")
 @matchesGroup.command(
     name='username',
     description='Get info on the recent matches of a player by username'
@@ -230,12 +232,14 @@ async def matches_leaderboard_position(interaction: Interaction, leaderboard_pos
 @app_commands.describe(username = 'username', ephemeral = 'Ephemeral?')
 async def matches_username(interaction: Interaction, username: str, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
-    profile, ranks = findPlayer(globals.season, username=username)
-    matches = get(profile["matches"]).json()["body"]
-    em = createSimpleMatchEmbed(matches, interaction)
-    matchView = MatchView(matches, interaction)
-
-    await interaction.followup.send(embed=em, view=matchView)
+    try:
+        profile, ranks = findPlayer(globals.season, username=username)
+        matches = get(profile["matches"]).json()["body"]
+        em = createSimpleMatchEmbed(matches, interaction)
+        matchView = MatchView(matches, interaction)
+        await interaction.followup.send(embed=em, view=matchView)
+    except:
+        await interaction.followup.send("Something went wrong")
 @matchesGroup.command(
     name='oakid',
     description='Get info on the recent matches of a player by OakID'
@@ -243,12 +247,15 @@ async def matches_username(interaction: Interaction, username: str, ephemeral: b
 @app_commands.describe(oakid = 'oakid', ephemeral = 'Ephemeral?')
 async def matches_oakid(interaction: Interaction, oakid: str, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
-    profile, ranks = findPlayer(globals.season, oakID=oakid)
-    matches = get(profile["matches"]).json()["body"]
-    em = createSimpleMatchEmbed(matches, interaction)
-    matchView = MatchView(matches, interaction)
+    try:
+        profile, ranks = findPlayer(globals.season, oakID=oakid)
+        matches = get(profile["matches"]).json()["body"]
+        em = createSimpleMatchEmbed(matches, interaction)
+        matchView = MatchView(matches, interaction)
 
-    await interaction.followup.send(embed=em, view=matchView)
+        await interaction.followup.send(embed=em, view=matchView)
+    except:
+        await interaction.followup.send("Something went wrong")
 
 
 tree.add_command(userGroup)
