@@ -100,8 +100,8 @@ async def ping(interaction: Interaction, ephemeral: bool = False):
 @app_commands.describe(member = 'member to timeout', minutes = 'Minutes to timeout for', ephemeral = 'Ephemeral?')
 async def timeout(interaction, member: Member, minutes: int, ephemeral: bool = False):
     try:
-        if minutes > 40320:
-            await interaction.response.send_message("Time must be less than 40320 minutes (28 days)", ephemeral=ephemeral)
+        if minutes > 1440:
+            await interaction.response.send_message("Time must be less than 1440 minutes (1 day)", ephemeral=ephemeral)
             return
         if minutes < 1:
             await interaction.response.send_message("Time must be greater than 0 minutes", ephemeral=ephemeral)
@@ -218,6 +218,7 @@ matchesGroup = app_commands.Group(name='matches', description="Get the recent ma
 async def matches_leaderboard_position(interaction: Interaction, leaderboard_position: int, ephemeral: bool = False):
     await interaction.response.defer(ephemeral=ephemeral)
     try:
+        leaderboard_position -= 1
         profile, ranks = findPlayer(globals.season, position=leaderboard_position)
         matches = get(profile["matches"]).json()["body"]
         em = createSimpleMatchEmbed(matches, interaction)
