@@ -38,7 +38,7 @@ async def on_message(message):
         or 'ace is passive' in message.content.lower()
         or 'im t1' in message.content.lower()
         or 'i\'m t1' in message.content.lower()
-        or 'this is me' in message.content.lower()):
+        or 'this is me' in message.content.lower() or 'that was me' in message.content.lower()):
             await message.channel.send("https://cdn.discordapp.com/emojis/823054363885830144.gif")
 
 @client.event
